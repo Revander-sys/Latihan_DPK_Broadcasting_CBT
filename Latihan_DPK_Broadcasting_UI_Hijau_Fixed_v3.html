@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT DPK Broadcasting & Perfilman</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --navy:#063b2c;--emerald:#16c784;--emerald2:#39e98b;--amber:#eabf43;--amber2:#f5d45e;
+  --red:#ef6262;--bg:#031f18;--card:#073526;--text:#e5f4ec;--muted:#91b6a5;
+  --border:#174b39;--radius:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(ellipse at top,#0a3b2b 0%,#031f18 55%,#021811 100%);color:var(--text);min-height:100vh}
+button{font-family:inherit}
+.header{background:rgba(3,31,24,.96);color:white;position:sticky;top:0;z-index:100;border-bottom:1px solid #174b39;box-shadow:0 8px 28px rgba(0,0,0,.22);backdrop-filter:blur(14px)}
+.header-inner{max-width:980px;margin:0 auto;padding:14px 20px;min-height:72px;display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:nowrap;position:relative}
+.header-badge{background:linear-gradient(135deg,#23d987,#a5f04d);color:#063b2c;font-weight:800;font-size:11px;padding:7px 11px;border-radius:10px;letter-spacing:.5px;position:absolute;left:20px;top:50%;transform:translateY(-50%)}
+.header h1{font-size:14px;font-weight:800;flex:none;line-height:1.4;text-align:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 190px);}
+.header h1 span{color:#a6f05a}
+#timer{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;background:#0b3024;padding:8px 12px;border-radius:10px;color:#e9f9ef;border:1px solid #286048;white-space:nowrap}
+#timer.urgent{background:rgba(239,68,68,.22);color:#ff9b9b;animation:pulse .8s infinite}
+#lock-badge{background:rgba(234,191,67,.12);border:1px solid rgba(234,191,67,.4);color:#f5d45e;font-size:10px;font-weight:800;padding:6px 10px;border-radius:20px;white-space:nowrap}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.progress-wrap{background:#05291e;padding:0 20px 12px}
+.progress-inner{max-width:940px;margin:0 auto}
+.progress-info{display:flex;justify-content:space-between;font-size:11px;color:#a2c6b3;margin-bottom:7px}
+.progress-bar{height:6px;background:#174b39;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#19c77b,#b2f34c);border-radius:99px;transition:width .4s ease}
+.main{max-width:940px;margin:0 auto;padding:24px 16px 50px;display:grid;gap:16px}
+.welcome-card{background:linear-gradient(120deg,#08452f,#0a3929);border:1px solid #1b5b40;border-radius:22px;padding:20px;box-shadow:0 8px 26px rgba(0,0,0,.14)}
+.welcome-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.avatar{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#1be28c,#a5f04d);display:grid;place-items:center;color:#063b2c;font-weight:900;font-size:17px}
+.welcome-name{font-weight:800;font-size:14px}
+.welcome-sub{font-size:11px;color:#9fc4b0;margin-top:4px}
+.section-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.section-tab{flex:1;min-width:80px;text-align:center;padding:10px 8px;border-radius:12px;background:#062d21;border:1px solid #174b39;color:#a6c9b7;font-size:11px;font-weight:700}
+.section-tab.active{background:#0e5638;color:#b4f45d;border-color:#27885a;box-shadow:inset 0 -2px #a6ef4e}
+.info-strip{background:#0a3023;border:1px solid #b18b2b;border-left:4px solid #e9c34d;color:#e6dba9;border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.6}
+.info-strip strong{color:#ffe27c}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.summary-tile{background:#073526;border:1px solid #174b39;border-radius:14px;padding:13px}
+.summary-value{font-size:20px;font-weight:800;color:#b3f35a}
+.summary-label{font-size:10px;color:#9dbdab;margin-top:4px}
+.nav-card{background:#073526;border:1px solid #174b39;border-radius:18px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.nav-title{font-size:11px;font-weight:800;color:#a9cbbb;letter-spacing:.6px;text-transform:uppercase;margin-bottom:11px}
+.nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:6px}
+.nav-btn{aspect-ratio:1;border:1px solid #285b46;background:#082d22;border-radius:9px;font-size:11px;font-weight:800;cursor:pointer;color:#a7c4b5;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.nav-btn:hover{border-color:#38d98a;color:#b7f45d}
+.nav-btn.answered{background:#123e2d;border-color:#1f9c62;color:#c7f6d7}
+.nav-btn.active{background:linear-gradient(135deg,#17c879,#9ce84b);border-color:#9ce84b;color:#063b2c;transform:scale(1.08)}
+.legend{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:#9ab9a8}
+.legend-dot{width:10px;height:10px;border-radius:3px;border:1px solid #709786}
+.soal-card{background:#073526;border:1px solid #174b39;border-radius:20px;padding:23px;box-shadow:0 6px 22px rgba(0,0,0,.15);animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.soal-meta{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.soal-num{background:#0d4933;color:#c5f6d5;font-size:12px;font-weight:800;padding:6px 12px;border-radius:8px;border:1px solid #216a49}
+.tipe-badge{font-size:10px;font-weight:800;padding:5px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px}
+.tipe-pg{background:#123f31;color:#9ef0c0;border:1px solid #236747}
+.pertanyaan{font-size:15px;font-weight:700;color:#effaf3;margin-bottom:16px;line-height:1.7}
+.options{display:flex;flex-direction:column;gap:9px}
+.option-btn{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid #285b46;border-radius:12px;background:#062b20;cursor:pointer;font-size:13px;text-align:left;transition:all .18s;color:#d8eee2;line-height:1.55;width:100%}
+.option-btn:hover:not(.disabled){border-color:#38d98a;background:#0a3a29}
+.opt-label{min-width:27px;height:27px;background:#0e4530;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#b9ef7a;flex-shrink:0}
+.option-btn.selected{border-color:#25d17f;background:#0b4931;box-shadow:0 0 0 1px rgba(37,209,127,.18)}
+.option-btn.selected .opt-label{background:#28d584;color:#063b2c}
+.option-btn.disabled{cursor:default}
+.instruksi{font-size:12px;color:#ffc2c2;font-weight:600;font-style:italic;margin-bottom:12px;padding:8px 12px;background:#482b2b;border-radius:8px;border:1px solid #754040}
+.pembahasan{margin-top:18px;border-top:1px dashed #285b46;padding-top:16px;display:none;animation:fadeIn .3s ease}
+.pembahasan.show{display:block}
+.pemb-header{font-size:11px;font-weight:800;color:#a7c9b7;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+.step{font-size:13px;color:#d0e7d9;margin-bottom:6px;padding-left:18px;position:relative;line-height:1.65}
+.step::before{content:"→";position:absolute;left:0;color:#63e5a1;font-weight:800}
+.jawaban-final{margin-top:10px;padding:11px 14px;background:#0d4933;border-radius:9px;font-weight:800;font-size:13px;color:#b8f3cd;border:1px solid #287a50}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.btn{padding:11px 18px;border-radius:11px;border:1px solid transparent;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(110deg,#18c97b,#a6ed4c);color:#063b2c}
+.btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn-outline{background:#082d22;color:#d5eee0;border-color:#285b46}
+.btn-outline:hover{border-color:#39d98b;color:#aef36b}
+.btn-accent{background:#e9c34d;color:#302707}
+.btn-accent:hover{background:#f5d45e}
+.btn:disabled{opacity:.35;cursor:default;transform:none!important}
+#result-screen{display:none;background:linear-gradient(155deg,#0b4935 0%,#082f25 100%);border:1px solid #287451;border-radius:20px;padding:30px 22px;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.24)}
+.result-emoji{font-size:54px;margin-bottom:12px}
+.result-title{font-size:24px;font-weight:900;color:#e9f8ef;margin-bottom:6px}
+.result-sub{font-size:13px;color:#a1c2b0;margin-bottom:20px}
+.score-big{font-size:64px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#a8ed55;line-height:1;margin-bottom:6px}
+.score-label{font-size:12px;color:#a1c2b0;margin-bottom:20px}
+.predikat{display:inline-block;padding:7px 18px;border-radius:20px;font-weight:800;font-size:13px;margin-bottom:20px}
+.donut-section{margin:20px 0 24px;text-align:center;background:#0b3b2d;border:1px solid #28634a;border-radius:18px;padding:20px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.donut-section-title{font-size:16px;font-weight:900;color:#f3fff7;margin-bottom:18px;letter-spacing:.2px}
+.donut-container{display:inline-block;position:relative;width:190px;height:190px}
+.donut-container canvas{display:block}
+.donut-center-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.donut-score-num{font-size:30px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#e5f4ec;line-height:1}
+.donut-score-sub{font-size:11px;color:#9dbdab;font-weight:600;margin-top:3px}
+.donut-legend{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.donut-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#f0fff5;background:#124a37;border:1px solid #327454;border-radius:9px;padding:8px 10px}
+.donut-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.donut-total{font-size:12px;color:#c4dfce;margin-top:12px;font-weight:600}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-box{padding:15px 8px;border-radius:13px;border:1px solid #39745a;background:#124332;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.stat-box.correct-box{border-color:#38b879;background:#104b35}
+.stat-box.wrong-box{border-color:#d66a6a;background:#542f32}
+.stat-box.skip-box{border-color:#8295a7;background:#344655}
+.stat-num{font-size:25px;font-weight:900;color:#ffffff}
+.stat-lbl{font-size:11px;color:#eff8f2;margin-top:5px;font-weight:700}
+.correct-box .stat-num{color:#75e9a9}.wrong-box .stat-num{color:#ff9999}
+#review-section{display:none;margin-top:20px}
+#review-section h2{color:#e5f4ec!important}
+.review-item{background:#073526;border:1px solid #174b39;border-radius:14px;padding:17px;margin-bottom:12px;border-left:4px solid #527866;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.review-item.correct{border-left-color:#28cf82}.review-item.wrong{border-left-color:#ef6262}
+.review-item .soal-num{background:#0d4933}
+@media(max-width:600px){
+ .header-inner{padding:12px 12px;gap:7px;min-height:70px}.header-badge{left:12px}.header h1{font-size:11px;text-align:center;max-width:calc(100% - 150px)}#lock-badge{display:none}#timer{font-size:13px;padding:8px 9px;min-width:76px;text-align:center}
+ .main{padding:16px 12px 36px;gap:13px}.soal-card{padding:16px}
+ .score-big{font-size:52px}.donut-container{width:165px;height:165px}.donut-section{padding:17px 10px}.donut-legend{gap:8px}.donut-legend-item{font-size:11px;padding:7px 8px}.stats-grid{gap:8px}
+ .summary-grid{gap:7px}.summary-tile{padding:11px 9px}.summary-value{font-size:18px}
+ .actions .btn{flex:1;justify-content:center;padding:11px 10px}
+}
+
+
+/* Security warning: hidden until a real visibility violation is detected */
+#violation-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  align-items:center;justify-content:center;flex-direction:column;
+  text-align:center;padding:28px 22px;
+  background:rgba(2,24,17,.97);color:#effaf3;
+}
+#violation-overlay.show{display:flex}
+#violation-overlay .viol-icon{font-size:42px;margin-bottom:14px}
+#violation-overlay .viol-title{font-size:22px;font-weight:900;color:#ff7777;margin-bottom:9px}
+#violation-overlay .viol-sub{font-size:14px;line-height:1.6;max-width:360px;color:#e3eee7}
+#violation-overlay .viol-count{font-size:44px;font-weight:900;color:#f5d45e;margin-top:12px;line-height:1}
+#violation-overlay .viol-label{font-size:12px;color:#b6cfc1;margin:5px 0 18px}
+#violation-overlay .viol-btn{border:0;border-radius:11px;padding:12px 18px;background:linear-gradient(110deg,#18c97b,#a6ed4c);color:#063b2c;font-size:13px;font-weight:800;cursor:pointer}
+
+</style>
+</head>
+<body>
+
+<!-- VIOLATION OVERLAY -->
+<div id="violation-overlay">
+  <div class="viol-icon">🚨</div>
+  <div class="viol-title">PELANGGARAN TERDETEKSI!</div>
+  <div class="viol-sub">Kamu keluar dari halaman CBT selama ujian berlangsung!</div>
+  <div class="viol-count" id="viol-count">0</div>
+  <div class="viol-label">total pelanggaran</div>
+  <div style="color:rgba(255,255,255,.85);font-size:14px;margin-bottom:24px;max-width:320px;line-height:1.6;">
+    ⚠️ Setiap pelanggaran dicatat. Jika kamu mengulanginya, hasilmu akan otomatis dikumpulkan!
+  </div>
+  <button class="viol-btn" onclick="dismissViolation()">✅ Kembali ke Soal</button>
+</div>
+
+<div class="header">
+  <div class="header-inner">
+    <span class="header-badge">R</span>
+    <h1>REVANDER FAUSTA HADRIAN<br><span>Latihan DPK · Kelas 10 PSPT 2</span></h1>
+    <span id="lock-badge">MODE LATIHAN</span>
+    <div id="timer">20:00</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-inner">
+      <div class="progress-info">
+        <span id="progress-text">Soal 1 dari 20</span>
+        <span id="answered-count">0 dijawab</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:3.3%"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <section class="welcome-card">
+    <div class="welcome-top">
+      <div class="avatar">R</div>
+      <div>
+        <div class="welcome-name">REVANDER FAUSTA HADRIAN</div>
+        <div class="welcome-sub">Kelas 10 PSPT 2 · SMK Negeri 1 Surabaya</div>
+      </div>
+    </div>
+    <div class="section-tabs">
+      <div class="section-tab">⌂<br>Beranda</div>
+      <div class="section-tab">◉<br>Materi</div>
+      <div class="section-tab active">▣<br>Belajar</div>
+      <div class="section-tab">✓<br>Evaluasi</div>
+      <div class="section-tab">☾<br>Progres</div>
+    </div>
+  </section>
+  <div class="info-strip"><strong>Persiapan DPK 2026</strong><br>Latihan mencakup profesi industri broadcasting dan perfilman, perkembangan teknologi, proses produksi, SOP peralatan, serta K3LH. Pilih jawaban paling tepat, lalu kumpulkan untuk melihat nilai dan pembahasan.</div>
+  <div class="summary-grid">
+    <div class="summary-tile"><div class="summary-value">20</div><div class="summary-label">Jumlah soal</div></div>
+    <div class="summary-tile"><div class="summary-value">20:00</div><div class="summary-label">Waktu latihan</div></div>
+    <div class="summary-tile"><div class="summary-value">3 BAB</div><div class="summary-label">Cakupan materi</div></div>
+  </div>
+  <div class="nav-card">
+    <div class="nav-title">Navigator Soal</div>
+    <div class="nav-grid" id="nav-grid"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#0d1b3e;border-color:#0d1b3e"></div>Dijawab</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669;border-color:#059669"></div>Aktif</div>
+      <div class="legend-item"><div class="legend-dot" style="border-color:#94a3b8;border-radius:50%"></div>Pilih satu jawaban yang paling tepat</div>
+    </div>
+  </div>
+
+  <div id="soal-area">
+    <div class="soal-card" id="soal-card"></div>
+    <div class="actions" id="actions"></div>
+  </div>
+
+  <div id="result-screen"></div>
+  <div id="review-section"></div>
+</div>
+
+<footer style="max-width:940px;margin:0 auto 28px;padding:0 16px;text-align:center;color:#6f9985;font-size:11px">SMK Negeri 1 Surabaya · DPK Broadcasting & Perfilman · 2026</footer>
+<script>
+// ═══════════════════════════════════════════════════════
+// LOCK SYSTEM – Anti Keluar
+// ═══════════════════════════════════════════════════════
+let current = 0;
+let answers = [];
+let submitted = false;
+let timerInterval = null;
+let timeLeft = 20 * 60;
+let violationCount = 0;
+let examActive = true;
+let audioCtx = null;
+let lastViolationAt = 0;
+let securityArmed = false;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playAlarm() {
+  try {
+    const ctx = getAudioCtx();
+    // Layered alarm: alternating beep pattern
+    const freqs = [880, 1100, 880, 1100, 880];
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.2);
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.2);
+      gain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + i * 0.2 + 0.02);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.2 + 0.18);
+      osc.start(ctx.currentTime + i * 0.2);
+      osc.stop(ctx.currentTime + i * 0.2 + 0.2);
+    });
+  } catch(e){}
+}
+
+function triggerViolation() {
+  if (!examActive || submitted) return;
+  const now = Date.now();
+  if (now - lastViolationAt < 2000) return;
+  lastViolationAt = now;
+  violationCount++;
+  document.getElementById('viol-count').textContent = violationCount;
+  document.getElementById('violation-overlay').classList.add('show');
+  playAlarm();
+  // Auto-submit jika pelanggaran >= 3
+  if (violationCount >= 3) {
+    setTimeout(() => {
+      document.getElementById('violation-overlay').classList.remove('show');
+      alert('⛔ Kamu telah melakukan 3 pelanggaran! Jawaban dikumpulkan secara otomatis.');
+      submitAll();
+    }, 2500);
+  }
+}
+
+function dismissViolation() {
+  document.getElementById('violation-overlay').classList.remove('show');
+  // Unlock audio context on user gesture
+  try { getAudioCtx().resume(); } catch(e){}
+}
+
+// Aktifkan deteksi setelah halaman benar-benar tampil, agar proses awal browser
+// atau pemuatan file lokal tidak dihitung sebagai pelanggaran.
+window.addEventListener('pageshow', () => {
+  setTimeout(() => { securityArmed = true; }, 1200);
+});
+
+// Deteksi saat siswa berpindah tab, membuka aplikasi lain, atau meminimalkan browser.
+document.addEventListener('visibilitychange', () => {
+  if (securityArmed && document.visibilityState === 'hidden' && examActive && !submitted) {
+    triggerViolation();
+  }
+});
+
+// Blokir klik kanan
+// Klik kanan tetap tersedia dalam mode latihan.
+
+// Blokir F12, Ctrl+Shift+I, dll saat ujian
+document.addEventListener('keydown', e => {
+  if (!examActive || submitted) return;
+  if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key))
+      || (e.ctrlKey && e.key === 'U')) {
+    e.preventDefault();
+    triggerViolation();
+  }
+});
+
+// Unlock AudioContext saat tap/klik pertama (mobile requirement)
+document.addEventListener('click', () => {
+  try { getAudioCtx().resume(); } catch(e){}
+}, {once: true});
+
+// ═══════════════════════════════════════════════════════
+// DATA SOAL – 20 Soal DPK Broadcasting & Perfilman
+const soalData = [
+  {no:1,tipe:"pg",tanya:"Peralatan yang mengubah gelombang suara menjadi sinyal audio listrik adalah ....",
+   opsi:["Speaker", "Audio mixer", "Microphone", "Equalizer"],
+   jawaban:"C",
+   pembahasan:["Mikrofon menangkap gelombang suara dari manusia atau lingkungan, lalu mengubahnya menjadi sinyal listrik. Sinyal ini dapat diteruskan ke mixer atau alat perekam untuk diproses."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:2,tipe:"pg",tanya:"Perangkat yang digunakan untuk mencampur dan mengatur beberapa sumber sinyal audio adalah ....",
+   opsi:["Audio mixer", "Monitor", "Tripod", "Video switcher"],
+   jawaban:"A",
+   pembahasan:["Audio mixer menerima beberapa sumber suara, misalnya mikrofon dan pemutar musik. Operator dapat mengatur volume setiap sumber dan mencampurnya menjadi satu keluaran audio."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:3,tipe:"pg",tanya:"Pada mikrofon atau perangkat audio, tombol yang berfungsi mengaktifkan dan menonaktifkan perangkat umumnya bertuliskan ....",
+   opsi:["Gain", "Pan", "On/Off", "Master"],
+   jawaban:"C",
+   pembahasan:["On/Off berarti nyala dan mati. Tombol ini digunakan untuk mengaktifkan atau mematikan perangkat. Pada beberapa mikrofon terdapat tombol mute yang berfungsi membisukan suara sementara."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:4,tipe:"pg",tanya:"Siapakah yang bertugas mengoperasikan kamera saat pengambilan gambar dalam produksi video atau film?",
+   opsi:["Camera operator", "Penata suara", "Penulis naskah", "Penata rias"],
+   jawaban:"A",
+   pembahasan:["Camera operator adalah orang yang mengoperasikan kamera dan mengikuti arahan pengambilan gambar. Penata suara menangani audio, penulis naskah menyusun cerita atau dialog, sedangkan penata rias menyiapkan riasan talent."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:5,tipe:"pg",tanya:"Orang yang bertugas mengatur kualitas rekaman, level, dan keseimbangan suara dalam produksi disebut ....",
+   opsi:["Editor video", "Floor director", "Audio person / penata suara", "Property man"],
+   jawaban:"C",
+   pembahasan:["Penata suara bertanggung jawab terhadap kebutuhan audio. Tugasnya dapat meliputi menyiapkan mikrofon, merekam suara, memantau level audio, dan memastikan suara terdengar jelas."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:6,tipe:"pg",tanya:"Proses mengubah sinyal audio digital menjadi sinyal analog agar dapat didengar melalui speaker disebut ....",
+   opsi:["Digital-to-Analog Conversion (DAC)", "Analog-to-Digital Conversion (ADC)", "Encoding video", "Modulasi cahaya"],
+   jawaban:"A",
+   pembahasan:["DAC adalah singkatan dari Digital-to-Analog Converter. Perangkat ini mengubah data audio digital menjadi sinyal analog yang kemudian dapat diperkuat oleh amplifier dan dikeluarkan melalui speaker."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:7,tipe:"pg",tanya:"Media penyimpanan audio berbentuk kaset kompak yang diperkenalkan Philips pada tahun 1963 adalah ....",
+   opsi:["Digital Audio Tape", "Compact audio cassette", "MP3", "Audio CD"],
+   jawaban:"B",
+   pembahasan:["Compact audio cassette atau kaset kompak diperkenalkan Philips pada 1963. Media ini digunakan untuk merekam dan memutar audio sebelum teknologi penyimpanan digital menjadi umum."],
+   jawabanFinal:"✅ Kunci jawaban: B"},
+  {no:8,tipe:"pg",tanya:"Banyaknya siklus gelombang suara yang terjadi dalam satu detik disebut ....",
+   opsi:["Amplitudo", "Periode", "Frekuensi", "Resonansi"],
+   jawaban:"C",
+   pembahasan:["Frekuensi adalah jumlah siklus gelombang dalam satu detik dan satuannya hertz (Hz). Contohnya, frekuensi 100 Hz berarti terjadi 100 siklus setiap detik. Amplitudo berkaitan dengan besar simpangan gelombang."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:9,tipe:"pg",tanya:"Salah satu perubahan penting dalam perkembangan teknologi broadcasting adalah peralihan dari sistem analog menuju sistem ....",
+   opsi:["Digital", "Mekanik", "Akustik", "Manual"],
+   jawaban:"A",
+   pembahasan:["Pada sistem digital, informasi audio dan video diolah dalam bentuk data digital. Perkembangan ini memudahkan penyimpanan, penyuntingan, pengiriman, dan distribusi konten."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:10,tipe:"pg",tanya:"Sebuah tim akan memproduksi podcast video bertema keselamatan kerja untuk siswa SMK. Agar gagasan produksi dapat diterjemahkan menjadi program yang terarah, keputusan manakah yang paling tepat ditetapkan terlebih dahulu pada tahap perencanaan ide?",
+   opsi:["Menentukan konsep, tujuan pesan, sasaran penonton, dan format penyajian", "Memilih efek transisi sebelum mengetahui isi program", "Menentukan jenis kamera berdasarkan merek yang sedang populer", "Melakukan color grading sebelum naskah dan alur disusun"],
+   jawaban:"A",
+   pembahasan:["Ide produksi yang baik perlu menjawab apa pesan yang disampaikan, untuk siapa program dibuat, dan bagaimana format penyampaiannya. Unsur tersebut menjadi dasar penyusunan naskah, kebutuhan kru, peralatan, serta jadwal produksi."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:11,tipe:"pg",tanya:"Dalam rapat praproduksi, sutradara meminta perubahan adegan yang membuat lokasi, jumlah talent, dan kebutuhan pencahayaan ikut berubah. Langkah kerja yang paling sesuai dengan proses produksi profesional adalah ....",
+   opsi:["Tetap memakai rencana lama agar jadwal tidak berubah", "Memperbarui breakdown produksi dan mengoordinasikan perubahan kepada departemen terkait", "Menyerahkan seluruh keputusan kepada operator kamera saat syuting", "Menghapus adegan tanpa memberi tahu kru lain"],
+   jawaban:"B",
+   pembahasan:["Perubahan konsep harus diterjemahkan ke kebutuhan produksi. Breakdown dan koordinasi antardepartemen membantu memastikan lokasi, talent, properti, pencahayaan, jadwal, serta peralatan tetap sesuai dengan rencana terbaru."],
+   jawabanFinal:"✅ Kunci jawaban: B"},
+  {no:12,tipe:"pg",tanya:"Saat menyiapkan sistem audio, operator menghubungkan mikrofon ke mixer dan speaker aktif. Urutan tindakan SOP yang paling aman sebelum menaikkan level suara adalah ....",
+   opsi:["Mengatur master ke maksimum, lalu memasang kabel", "Memastikan perangkat dalam kondisi aman, menurunkan level output, memasang konektor dengan benar, lalu menyalakan sesuai urutan prosedur", "Melepas kabel ground agar suara lebih keras", "Menyalakan speaker terlebih dahulu dengan level tinggi agar dapat langsung diuji"],
+   jawaban:"B",
+   pembahasan:["Pemeriksaan kondisi dan konektor dilakukan sebelum perangkat dioperasikan. Level output diturunkan untuk mengurangi risiko bunyi kejut atau lonjakan suara. Ikuti urutan menyalakan dan mematikan perangkat sesuai petunjuk masing-masing alat."],
+   jawabanFinal:"✅ Kunci jawaban: B"},
+  {no:13,tipe:"pg",tanya:"Dalam survei lokasi syuting ditemukan kabel melintang di jalur kru. Kru berpotensi tersandung, tetapi belum ada yang terluka. Dalam konsep K3, situasi tersebut paling tepat dipahami sebagai ....",
+   opsi:["Kecelakaan kerja karena sudah terjadi cedera", "Potensi bahaya yang dapat menimbulkan risiko tersandung", "Pascaproduksi karena lokasi sudah selesai digunakan", "Kerusakan data akibat sistem digital"],
+   jawaban:"B",
+   pembahasan:["Kabel yang melintang merupakan sumber atau kondisi berbahaya (hazard). Kondisi itu menimbulkan risiko tersandung. Belum terjadi kecelakaan, sehingga tindakan pencegahan perlu dilakukan sebelum kegiatan berlangsung."],
+   jawabanFinal:"✅ Kunci jawaban: B"},
+  {no:14,tipe:"pg",tanya:"Seorang kru mengabaikan instruksi penggunaan tangga dan berdiri di anak tangga paling atas. Pada saat yang sama, salah satu kaki tangga diketahui retak. Analisis penyebab kecelakaan yang paling tepat adalah ....",
+   opsi:["Keduanya termasuk unsafe action", "Keduanya termasuk unsafe condition", "Mengabaikan instruksi adalah unsafe action, sedangkan tangga retak adalah unsafe condition", "Tangga retak adalah unsafe action, sedangkan mengabaikan instruksi adalah unsafe condition"],
+   jawaban:"C",
+   pembahasan:["Unsafe action berasal dari perilaku atau tindakan pekerja yang tidak aman. Unsafe condition berasal dari keadaan alat atau lingkungan yang tidak aman. Dalam contoh ini, keduanya hadir bersamaan dan harus dikendalikan."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:15,tipe:"pg",tanya:"Ketika produksi berlangsung, tercium bau hangus dari stopkontak yang digunakan untuk beberapa lampu. Tindakan pertama yang paling tepat berdasarkan prinsip K3 adalah ....",
+   opsi:["Menyiram stopkontak dengan air agar cepat dingin", "Mencabut kabel dengan menarik bagian kabel tanpa memutus sumber listrik", "Menghentikan penggunaan sumber listrik tersebut, menjauhkan kru dari area, dan meminta penanggung jawab menangani dengan prosedur aman", "Melanjutkan syuting selama lampu masih menyala"],
+   jawaban:"C",
+   pembahasan:["Bau hangus dapat menjadi tanda gangguan listrik dan potensi kebakaran atau sengatan. Hentikan penggunaan dan amankan area. Jangan menyiram peralatan listrik dengan air atau menangani instalasi berbahaya tanpa kewenangan."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:16,tipe:"pg",tanya:"Setelah produksi luar ruang selesai, tim menemukan baterai bekas, kemasan makanan, dan kabel yang masih layak pakai. Tindakan yang paling mencerminkan penerapan K3LH adalah ....",
+   opsi:["Mencampur semua limbah agar mudah dibawa", "Membuang baterai ke saluran air dan menyimpan kabel di tanah", "Memilah limbah sesuai jenisnya, menangani baterai bekas secara tepat, serta menyimpan kabel yang masih layak dengan rapi", "Meninggalkan seluruh perlengkapan di lokasi karena produksi telah selesai"],
+   jawaban:"C",
+   pembahasan:["K3LH tidak hanya mengutamakan keselamatan kru, tetapi juga menjaga lingkungan. Limbah perlu dipilah, baterai bekas tidak dibuang sembarangan, dan peralatan yang masih layak disimpan agar tidak menjadi sumber bahaya atau sampah."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:17,tipe:"pg",tanya:"Sebuah film pendek telah selesai direkam. Editor menyusun gambar, memilih bagian terbaik, menyinkronkan audio, dan menambahkan grafis judul. Kegiatan tersebut termasuk tahap ....",
+   opsi:["Praproduksi karena menentukan konsep cerita", "Produksi karena kamera masih menjadi bagian utama", "Pascaproduksi karena mengolah hasil rekaman menjadi karya akhir", "Distribusi karena film sudah ditayangkan kepada penonton"],
+   jawaban:"C",
+   pembahasan:["Penyuntingan gambar dan suara, penambahan grafis, serta penyelesaian hasil rekaman termasuk pascaproduksi. Tahap ini dilakukan setelah proses pengambilan gambar atau perekaman selesai."],
+   jawabanFinal:"✅ Kunci jawaban: C"},
+  {no:18,tipe:"pg",tanya:"Sebuah kamera akan dipasang pada tripod untuk pengambilan gambar berdurasi panjang. Pemeriksaan yang paling tepat sebelum kamera dilepas dari tangan operator adalah ....",
+   opsi:["Memastikan tripod terkunci dan stabil, kepala tripod terpasang benar, serta beban kamera sesuai kemampuan tripod", "Memastikan kaki tripod dapat dilipat dengan cepat saat kamera terpasang", "Mengendurkan seluruh pengunci agar kamera mudah digerakkan", "Menggantung tas berat pada satu sisi tripod tanpa memeriksa keseimbangannya"],
+   jawaban:"A",
+   pembahasan:["Tripod harus berada pada permukaan stabil, seluruh pengunci terkunci, dan kapasitas bebannya sesuai. Pemeriksaan ini mencegah kamera jatuh dan mengurangi risiko cedera atau kerusakan peralatan."],
+   jawabanFinal:"✅ Kunci jawaban: A"},
+  {no:19,tipe:"pg",tanya:"Dalam penerapan Industri 4.0, studio menggunakan kamera dan sensor yang terhubung ke jaringan untuk mengirim status perangkat ke sistem pemantauan. Manfaat utama penerapan Internet of Things (IoT) pada situasi tersebut adalah ....",
+   opsi:["Menghilangkan seluruh kebutuhan operator dan kru produksi", "Memungkinkan perangkat mengirim data sehingga kondisi peralatan dapat dipantau dan proses kerja lebih terintegrasi", "Mengubah semua sinyal digital menjadi gelombang suara secara otomatis", "Membuat perangkat selalu aman tanpa pemeriksaan dan SOP"],
+   jawaban:"B",
+   pembahasan:["IoT menghubungkan perangkat melalui jaringan agar dapat mengirim dan menerima data. Data tersebut dapat digunakan untuk pemantauan dan integrasi proses, tetapi tidak menggantikan kebutuhan SOP, pengawasan, dan keputusan manusia."],
+   jawabanFinal:"✅ Kunci jawaban: B"},
+  {no:20,tipe:"pg",tanya:"Sebuah stasiun produksi mulai memindahkan arsip video dari kaset analog ke penyimpanan digital. Pertimbangan yang paling tepat untuk menjelaskan keuntungan sekaligus kebutuhan pengelolaan sistem digital adalah ....",
+   opsi:["File digital tidak mungkin rusak sehingga tidak perlu dicadangkan", "Materi digital lebih mudah disalin, dicari, dan disunting, tetapi tetap memerlukan pengelolaan format, keamanan, dan backup", "Perubahan ke digital membuat kualitas rekaman selalu meningkat tanpa dipengaruhi sumber aslinya", "Penyimpanan digital menghilangkan kebutuhan metadata dan pengarsipan"],
+   jawaban:"B",
+   pembahasan:["Teknologi digital memudahkan pengolahan, pencarian, penyalinan, dan distribusi materi. Namun, file tetap berisiko hilang atau rusak sehingga perlu pengelolaan format, metadata, keamanan akses, dan pencadangan."],
+   jawabanFinal:"✅ Kunci jawaban: B"}
+];
+
+
+
+// CBT CORE: pemulihan state, navigator, navigasi, progres, dan timer.
+function buildNavigator() {
+  const grid = document.getElementById('nav-grid');
+  if (!grid) throw new Error('Elemen navigator soal tidak ditemukan.');
+  grid.innerHTML = soalData.map((s, i) =>
+    `<button type="button" class="nav-btn" id="nav-${i}" onclick="goTo(${i})" aria-label="Buka soal ${s.no}">${s.no}</button>`
+  ).join('');
+}
+
+function updateNavigator() {
+  const answered = soalData.filter((s, i) => isAnswered(s, answers[i])).length;
+  const count = document.getElementById('answered-count');
+  const progressText = document.getElementById('progress-text');
+  const fill = document.getElementById('progress-fill');
+  if (count) count.textContent = `${answered} dijawab`;
+  if (progressText) progressText.textContent = `Soal ${current + 1} dari ${soalData.length}`;
+  if (fill) fill.style.width = `${((current + 1) / soalData.length) * 100}%`;
+
+  soalData.forEach((s, i) => {
+    const btn = document.getElementById(`nav-${i}`);
+    if (!btn) return;
+    btn.classList.toggle('active', i === current);
+    btn.classList.toggle('answered', isAnswered(s, answers[i]));
+  });
+}
+
+function goTo(index) {
+  if (submitted || !Number.isInteger(index) || index < 0 || index >= soalData.length) return;
+  current = index;
+  renderSoal();
+  updateNavigator();
+}
+
+function startTimer() {
+  const timer = document.getElementById('timer');
+  if (timerInterval) clearInterval(timerInterval);
+  const paint = () => {
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    if (timer) {
+      timer.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      timer.classList.toggle('urgent', timeLeft <= 60);
+    }
+    if (timeLeft <= 0 && !submitted) {
+      clearInterval(timerInterval);
+      alert('Waktu latihan telah habis. Jawaban akan dikumpulkan otomatis.');
+      submitAll();
+    }
+  };
+  paint();
+  timerInterval = setInterval(() => {
+    if (submitted) return clearInterval(timerInterval);
+    timeLeft = Math.max(0, timeLeft - 1);
+    paint();
+  }, 1000);
+}
+
+
+function renderSoal() {
+  const area = document.getElementById('soal-area');
+  if (area) area.style.display = 'block';
+  const s = soalData[current];
+  const card = document.getElementById('soal-card');
+  const teks = null;
+  const tipeBadge = {pg:'🔵 Pilihan Ganda'};
+  const tipeClass = {pg:'tipe-pg'};
+
+  let html = `<div class="soal-meta">
+    <span class="soal-num">No. ${s.no}</span>
+    <span class="tipe-badge ${tipeClass[s.tipe]}">${tipeBadge[s.tipe]}</span>
+  </div>`;
+
+  if(teks) {
+    html += `<div class="teks-box">
+      <div style="font-size:10px;color:#059669;font-weight:700;margin-bottom:6px">${teks.label}</div>
+      ${teks.isi}
+    </div>`;
+  }
+
+  if(s.instruksi) html += `<div class="instruksi">⚠️ ${s.instruksi}</div>`;
+  if(s.tanya) html += `<div class="pertanyaan">${s.tanya.replace(/\n/g,'<br>')}</div>`;
+
+  const labels=['A','B','C','D'];
+  html += `<div class="options">`;
+  s.opsi.forEach((o,i) => {
+    const lbl=labels[i], sel=answers[current]===lbl;
+    html += `<button class="option-btn ${sel?'selected':''} ${submitted?'disabled':''}" onclick="selectPG('${lbl}')">
+      <span class="opt-label">${lbl}</span><span>${o}</span></button>`;
+  });
+  html += `</div>`;
+
+  // Pembahasan baru ditampilkan setelah peserta mengumpulkan seluruh jawaban.
+  card.innerHTML = html;
+
+  const actions = document.getElementById('actions');
+  let actHtml = '';
+  if(!submitted) {
+    actHtml += `<button class="btn btn-outline" onclick="goTo(${Math.max(0,current-1)})" ${current===0?'disabled':''}>← Sebelumnya</button>`;
+    actHtml += `<button class="btn btn-primary" onclick="goTo(${Math.min(soalData.length-1,current+1)})" ${current===soalData.length-1?'disabled':''}>Selanjutnya →</button>`;
+    actHtml += `<button class="btn btn-accent" onclick="confirmSubmit()" style="margin-left:auto">🏁 Kumpulkan</button>`;
+  } else {
+    actHtml += `<button class="btn btn-outline" onclick="goTo(${Math.max(0,current-1)})" ${current===0?'disabled':''}>← Sebelumnya</button>`;
+    actHtml += `<button class="btn btn-primary" onclick="goTo(${Math.min(soalData.length-1,current+1)})" ${current===soalData.length-1?'disabled':''}>Selanjutnya →</button>`;
+  }
+  actions.innerHTML = actHtml;
+}
+
+function renderPembahasan(s, answer) {
+  const tepat = isCorrect(s, answer);
+  let html = `<div class="pembahasan show"><div class="pemb-header">💡 Pembahasan &amp; Kunci Jawaban</div>`;
+  html += `<div class="jawaban-final" style="background:${tepat?'#dcfce7':'#fee2e2'};color:${tepat?'#065f46':'#991b1b'};border-color:${tepat?'#86efac':'#fca5a5'}">
+    ${tepat?'✅ Jawaban kamu tepat!':'❌ Jawaban kamu belum tepat.'} ${s.jawabanFinal}
+  </div>`;
+  if(s.pembahasan) s.pembahasan.forEach(l => { html += `<div class="step">${l}</div>`; });
+  if(!submitted) html += `<div style="font-size:11px;color:var(--muted);margin-top:8px">Kamu masih bisa mengubah pilihan jawaban sebelum menekan tombol Kumpulkan.</div>`;
+  html += `</div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANSWER SELECTION
+// ═══════════════════════════════════════════════════════
+function selectPG(lbl) {
+  if(submitted) return;
+  answers[current] = lbl;
+  updateNavigator(); renderSoal();
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT & SCORE
+// ═══════════════════════════════════════════════════════
+function confirmSubmit() {
+  const done = soalData.filter((s,i)=>isAnswered(s,answers[i])).length;
+  const unanswered = soalData.length - done;
+  if(unanswered>0 && !confirm(`Masih ada ${unanswered} soal yang belum dijawab.\nYakin ingin mengumpulkan?`)) return;
+  submitAll();
+}
+
+function isAnswered(s, a) {
+  if(!a) return false;
+  if(s.tipe==='pg') return typeof a === 'string';
+  if(s.tipe==='pgk') return Array.isArray(a) && a.length > 0;
+  if(s.tipe==='bs') return s.pernyataan.every(p => a[p.label]);
+  return false;
+}
+function isCorrect(s, a) {
+  if(!isAnswered(s,a)) return false;
+  if(s.tipe==='pg') return a === s.jawaban;
+  if(s.tipe==='pgk') { const sort=arr=>[...arr].sort().join(','); return sort(a)===sort(s.jawaban); }
+  if(s.tipe==='bs') return s.pernyataan.every(p => a[p.label] === p.jawaban);
+  return false;
+}
+function calculateScore() {
+  let correct=0, skip=0, wrong=0;
+  soalData.forEach((s,i) => {
+    const a=answers[i];
+    if(!isAnswered(s,a)) skip++;
+    else if(isCorrect(s,a)) correct++;
+    else wrong++;
+  });
+  return {correct, wrong, skip};
+}
+
+// ═══════════════════════════════════════════════════════
+// DONUT CHART – Canvas-based, mobile-safe, perfectly centered
+// ═══════════════════════════════════════════════════════
+function drawDonut(canvasId, correct, wrong, skip, total, score) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const size = canvas.offsetWidth;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cx = size / 2, cy = size / 2;
+  const r = size * 0.36;
+  const lineW = size * 0.13;
+
+  // Data segments: [value, color]
+  const segs = [
+    [correct, '#059669'],
+    [wrong,   '#ef4444'],
+    [skip,    '#cbd5e1']
+  ].filter(s => s[0] > 0);
+
+  const tau = 2 * Math.PI;
+  let startAngle = -Math.PI / 2; // start at top
+
+  if(segs.length === 0) {
+    // All zero — draw grey ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, tau);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = lineW;
+    ctx.stroke();
+  } else {
+    segs.forEach(([val, color]) => {
+      const sweep = (val / total) * tau;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAngle, startAngle + sweep);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'butt';
+      ctx.stroke();
+      startAngle += sweep;
+    });
+  }
+
+  // Center text
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#0d1b3e';
+  ctx.font = `800 ${size*0.17}px 'JetBrains Mono', monospace`;
+  ctx.fillText(score, cx, cy - size*0.04);
+  ctx.font = `600 ${size*0.08}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('/ 100', cx, cy + size*0.09);
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT ALL
+// ═══════════════════════════════════════════════════════
+function submitAll() {
+  clearInterval(timerInterval);
+  submitted = true;
+  examActive = false; // Hentikan lock setelah selesai
+  document.getElementById('soal-area').style.display='none';
+  document.getElementById('nav-grid').parentElement.style.display='none';
+  document.getElementById('lock-badge').style.display='none';
+
+  const {correct,wrong,skip} = calculateScore();
+  const score = Math.round((correct/soalData.length)*100);
+
+  let emoji,predikat,pc;
+  if(score>=90){emoji='🏆';predikat='Luar Biasa!';pc='#065f46';}
+  else if(score>=75){emoji='🌟';predikat='Sangat Bagus!';pc='#1d4ed8';}
+  else if(score>=60){emoji='👍';predikat='Cukup Baik';pc='#b45309';}
+  else if(score>=40){emoji='📚';predikat='Perlu Belajar Lagi';pc='#dc2626';}
+  else{emoji='💪';predikat='Jangan Menyerah!';pc='#7c3aed';}
+
+  const rs = document.getElementById('result-screen');
+  rs.style.display='block';
+  rs.innerHTML = `
+    <div class="result-emoji">${emoji}</div>
+    <div class="result-title">Latihan Selesai!</div>
+    <div class="result-sub">DPK Broadcasting & Perfilman – 20 Soal Pilihan Ganda</div>
+    <div style="max-width:650px;margin:0 auto 20px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;color:#1e40af;font-size:13px;line-height:1.6">
+      💡 <b>Mode latihan:</b> Setelah jawaban dikumpulkan, kunci jawaban dan pembahasan sederhana untuk seluruh soal akan langsung ditampilkan di bawah hasil nilai.
+    </div>
+    <div class="score-big" style="color:var(--emerald)">${score}</div>
+    <div class="score-label">dari 100 poin</div>
+    <span class="predikat" style="background:${pc}20;color:${pc};border:2px solid ${pc}40">${predikat}</span>
+
+    <div class="donut-section">
+      <div class="donut-section-title">Laporan Skor</div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="donut-container">
+          <canvas id="donut-canvas" style="width:100%;height:100%;display:block;"></canvas>
+        </div>
+        <div class="donut-legend">
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#059669"></div>Benar: <b style="color:#70f0b0">${correct}</b></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#ef4444"></div>Salah: <b style="color:#ffaaaa">${wrong}</b></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#cbd5e1"></div>Belum Dijawab: <b style="color:#e3edf5">${skip}</b></div>
+        </div>
+        <div class="donut-total">Total Soal: <b>${soalData.length}</b></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box correct-box"><div class="stat-num">${correct}</div><div class="stat-lbl">✅ Benar</div></div>
+      <div class="stat-box wrong-box"><div class="stat-num">${wrong}</div><div class="stat-lbl">❌ Salah</div></div>
+      <div class="stat-box skip-box"><div class="stat-num">${skip}</div><div class="stat-lbl">⏭ Dilewati</div></div>
+    </div>
+
+    ${violationCount > 0 ? `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#856404">
+      ⚠️ Kamu tercatat melakukan <b>${violationCount} pelanggaran</b> keluar halaman selama ujian.
+    </div>` : ''}
+
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-accent" onclick="location.reload()">🔄 Ulangi Latihan</button>
+    </div>`;
+
+  showReview(false);
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Draw canvas after DOM render
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      drawDonut('donut-canvas', correct, wrong, skip, soalData.length, score);
+    });
+  });
+}
+
+function showReview(shouldScroll=true) {
+  const rev = document.getElementById('review-section');
+  rev.style.display='block';
+  let html=`<h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:16px">📋 Review Pembahasan Lengkap</h2>`;
+  soalData.forEach((s,i) => {
+    const a=answers[i];
+    let status='skip';
+    if(isAnswered(s,a)) status=isCorrect(s,a)?'correct':'wrong';
+    const tipeBadge={pg:'Pilihan Ganda'};
+    html+=`<div class="review-item ${status}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="soal-num">No. ${s.no}</span>
+        <span class="tipe-badge tipe-${s.tipe}" style="font-size:10px">${tipeBadge[s.tipe]}</span>
+        <span style="margin-left:auto;font-size:12px;font-weight:700;color:${status==='correct'?'var(--emerald)':status==='wrong'?'var(--red)':'var(--muted)'}">
+          ${status==='correct'?'✅ Benar':status==='wrong'?'❌ Salah':'⏭ Dilewati'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${s.tanya?s.tanya.replace(/\n/g,'<br>'):''}</div>
+      ${renderPembahasan(s,a)}
+    </div>`;
+  });
+  rev.innerHTML=html;
+  if(shouldScroll) rev.scrollIntoView({behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+try {
+  if (!Array.isArray(soalData) || soalData.length !== 20) throw new Error('Bank soal tidak lengkap.');
+  buildNavigator();
+  updateNavigator();
+  renderSoal();
+  startTimer();
+} catch (err) {
+  console.error('Gagal memuat CBT:', err);
+  const card = document.getElementById('soal-card');
+  if (card) card.innerHTML = '<div style="padding:18px;color:#ffd2a8">Soal gagal dimuat. Muat ulang file HTML terbaru.</div>';
+}
+</script>
+</body>
+</html>
